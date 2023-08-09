@@ -20,8 +20,8 @@ pub fn build(b: *std.build.Builder) void {
         .version = std.SemanticVersion{ .major = 0, .minor = 1, .patch = 0 },
     });
 
-    lib.addIncludePath("grpc/include/grpc");
     lib.linkLibC();
+    lib.addIncludePath(.{ .path = "grpc/include/grpc" });
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
@@ -34,6 +34,10 @@ pub fn build(b: *std.build.Builder) void {
         .target = target,
         .optimize = optimize,
     });
+
+    main_tests.linkLibC();
+    main_tests.addIncludePath(.{ .path = "grpc/include/grpc" });
+    main_tests.linkSystemLibraryNeeded("groc/include/grpc");
 
     const run_main_tests = b.addRunArtifact(main_tests);
 
