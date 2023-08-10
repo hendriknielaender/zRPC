@@ -21,7 +21,7 @@ pub fn build(b: *std.build.Builder) void {
     });
 
     lib.linkLibC();
-    lib.addIncludePath(.{ .path = "grpc/include/grpc" });
+    lib.addIncludePath(.{ .path = "grpc/include" });
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
@@ -36,8 +36,8 @@ pub fn build(b: *std.build.Builder) void {
     });
 
     main_tests.linkLibC();
-    main_tests.addIncludePath(.{ .path = "grpc/include/grpc" });
-    main_tests.linkSystemLibraryNeeded("groc/include/grpc");
+    main_tests.addIncludePath(.{ .path = "grpc/include" });
+    //main_tests.linkSystemLibraryNeeded("grpc");
 
     const run_main_tests = b.addRunArtifact(main_tests);
 

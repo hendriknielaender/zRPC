@@ -1,3 +1,3 @@
 pub usingnamespace @cImport({
-    @cInclude("grpc.h");
+    @cInclude("grpc/grpc.h");
 });
