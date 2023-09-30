@@ -1,5 +1,5 @@
 const std = @import("std");
-const grpc = @import("c.zig");
+const grpc = @import("grpc/grpc-bindings.zig");
 
 test "grpc_import_test" {
     _ = grpc.GRPC_CALL_OK;
