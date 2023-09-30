@@ -1,3 +1,7 @@
 [submodule "grpc"]
 	path = grpc
-	url = https://github.com/grpc/grpc
+    url = https://github.com/grpc/grpc
+    ignore = dirty
+    depth = 1
+    shallow = true
+    fetchRecurseSubmodules = false
