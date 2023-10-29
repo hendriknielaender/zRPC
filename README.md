@@ -1,7 +1,12 @@
-# zRPC - gRPC for Zig (Built on C Core Library)
---
-
+<h1 align="center">
+   <img src="logo.png" width="30%" height="30%" alt="zRPC logo" title="zRPC logo">
+  <br><br>
+  ⚡zRPC - gRPC for Zig (Built on C Core Library)
+</h1>
+<div align="center">
 This is a gRPC library for the Zig programming language built on top of the C Core library. It provides an efficient and expressive way to communicate between microservices using the gRPC protocol in Zig.
+</div>
+<br><br>
 
 ## Features
 
