@@ -1,5 +1,5 @@
 <h1 align="center">
-   <img src="logo.png" width="30%" height="30%" alt="zRPC logo" title="zRPC logo">
+   <img src="logo.png" width="20%" height="20%" alt="zRPC logo" title="zRPC logo">
   <br><br>
   ⚡zRPC - gRPC for Zig (Built on C Core Library)
 </h1>
