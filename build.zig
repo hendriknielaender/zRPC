@@ -1,49 +1,43 @@
 const std = @import("std");
 
 pub fn build(b: *std.build.Builder) void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{});
-
-    // Standard optimization options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
-    // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addSharedLibrary(.{
-        .name = "zRPC",
-        .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
-        .optimize = optimize,
-        .version = std.SemanticVersion{ .major = 0, .minor = 1, .patch = 0 },
-    });
-
-    lib.linkLibC();
-    lib.addIncludePath(.{ .path = "grpc/include" });
-    // This declares intent for the library to be installed into the standard
-    // location when the user invokes the "install" step (the default step when
-    // running `zig build`).
+    const lib = setupSharedLibrary(b, "zRPC", "src/main.zig", target, optimize, std.SemanticVersion{ .major = 0, .minor = 1, .patch = 0 });
     b.installArtifact(lib);
 
-    // Creates a step for unit testing. This only builds the test executable
-    // but does not run it.
-    const main_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+    const main_tests = setupTest(b, "src/main.zig", target, optimize);
+    const run_main_tests = b.addRunArtifact(main_tests);
+
+    setupTestStep(b, &run_main_tests.step);
+}
+
+fn setupSharedLibrary(b: *std.build.Builder, name: []const u8, root_source: []const u8, target: std.zig.CrossTarget, optimize: std.builtin.OptimizeMode, version: std.SemanticVersion) *std.build.LibExeObjStep {
+    const lib = b.addSharedLibrary(.{
+        .name = name,
+        .root_source_file = .{ .path = root_source },
+        .target = target,
+        .optimize = optimize,
+        .version = version,
+    });
+    lib.linkLibC();
+    lib.addIncludePath(.{ .path = "grpc/include" });
+    return lib;
+}
+
+fn setupTest(b: *std.build.Builder, root_source: []const u8, target: std.zig.CrossTarget, optimize: std.builtin.OptimizeMode) *std.build.LibExeObjStep {
+    const test_lib = b.addTest(.{
+        .root_source_file = .{ .path = root_source },
         .target = target,
         .optimize = optimize,
     });
+    test_lib.linkLibC();
+    test_lib.addIncludePath(.{ .path = "grpc/include" });
+    return test_lib;
+}
 
-    main_tests.linkLibC();
-    main_tests.addIncludePath(.{ .path = "grpc/include" });
-    //main_tests.linkSystemLibraryNeeded("grpc");
-
-    const run_main_tests = b.addRunArtifact(main_tests);
-
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build test`
-    // This will evaluate the `test` step rather than the default, which is "install".
+fn setupTestStep(b: *std.build.Builder, run_main_tests: *std.build.Step) void {
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&run_main_tests.step);
+    test_step.dependOn(run_main_tests);
 }
