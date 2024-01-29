@@ -16,7 +16,6 @@ const Greeter = struct {
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    const allocator = gpa.allocator();
     defer {
         const deinit_status = gpa.deinit();
         if (deinit_status == .leak) std.debug.panic("Memory leak detected\n", .{});
@@ -35,16 +34,21 @@ pub fn main() !void {
     const server = grpc.grpc_server_create(args, reserved) orelse return error.FailedToInitializeServer;
     defer grpc.grpc_server_destroy(server); // Replace with the correct function to clean up the server
 
-    var greeter = Greeter{ .allocator = &allocator };
-    defer greeter.deinit();
+    const method_name = "Greeter/SayHello"; // Replace with the correct method name as per your .proto file
 
-    try server.registerService(&greeter);
-    try server.start();
+    // Additional parameters required by grpc_server_register_method
+    const host = null; // or specify a host if necessary
+    const payload_handling = grpc.GRPC_SRM_PAYLOAD_READ_INITIAL_BYTE_BUFFER; // or another appropriate value
+    const flags = 0; // use appropriate flags
+
+    const method = grpc.grpc_server_register_method(server, method_name, host, payload_handling, flags);
+    if (method == null) {
+        std.debug.print("Failed to register the gRPC method.\n", .{});
+        return error.FailedToRegisterMethod;
+    }
+
+    grpc.grpc_server_start(server);
 
     const stdout = std.io.getStdOut().writer();
     try stdout.print("gRPC server running on {s}\n", .{target});
-
-    while (true) {
-        try server.run();
-    }
 }
